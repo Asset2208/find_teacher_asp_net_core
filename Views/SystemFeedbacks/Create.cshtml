@@ -1,0 +1,93 @@
+﻿@model FindTeacher.Models.SystemFeedback
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/contacts.css" />
+</head>
+
+<hr />
+@*<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserFullName" class="control-label"></label>
+                <input asp-for="UserFullName" class="form-control" />
+                <span asp-validation-for="UserFullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserEmail" class="control-label"></label>
+                <input asp-for="UserEmail" class="form-control" />
+                <span asp-validation-for="UserEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Message" class="control-label"></label>
+                <input asp-for="Message" class="form-control" />
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SystemFeedbackCategoryId" class="control-label"></label>
+                <select asp-for="SystemFeedbackCategoryId" class ="form-control" asp-items="ViewBag.SystemFeedbackCategoryId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>*@
+<div class="container contentblock">
+    <div class="row">
+        <div class="col-md-8 offset-2 rightcontent">
+            <h1 class="title">Напишите нам</h1>
+            <div class="emailusform">
+                <form asp-action="Create" id="submitForm">
+                    <div class="arrowlink formrow">
+                        <select asp-for="SystemFeedbackCategoryId" class="form-control" asp-items="ViewBag.SystemFeedbackCategoryId"></select>
+                        <label class="valid">Тип обратной связи</label>
+                    </div>
+                    <div class="row">
+                        <div class="halfleft formrow">
+                            <input asp-for="UserFullName" type="text" class="form-control" name="UserFullName" required="required" />
+                            <label>Имя (латинскими буквами)</label>
+                            <span asp-validation-for="UserFullName" class="text-danger"></span>
+                        </div>
+                        <div class="halfright formrow">
+                            <input asp-for="UserEmail" type="email" class="form-control" name="UserEmail"
+                                   required="required">
+                            <label>Электронная почта</label>
+                            <span asp-validation-for="UserEmail" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="formrow">
+                        <textarea asp-for="Message" placeholder="Сообщение (максимум 150 слов)" class="form-control" name="message"
+                                  required="required"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+                   
+                    <div class="formrow">
+                        <div class="row">
+                            <div class="col-md-9"></div>
+                            <div class="col-md-3">
+                                <button id="submitButton" class="btn btn-success"
+                                        type="submit">
+                                    Отправить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
