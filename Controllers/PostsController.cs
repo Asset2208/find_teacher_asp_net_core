@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FindTeacher.Data;
 using FindTeacher.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FindTeacher.Controllers
 {
@@ -20,10 +21,36 @@ namespace FindTeacher.Controllers
         }
 
         // GET: Posts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? category, string name, int page = 1)
         {
-            var applicationDbContext = _context.Posts.Include(p => p.PostCategory);
-            return View(await applicationDbContext.ToListAsync());
+            int pageSize = 5;
+            IQueryable<Post> posts = _context.Posts.Include(p => p.PostCategory).OrderByDescending(b => b.Created_date);
+
+            //фильтрация
+            if (category != null && category != 0)
+            {
+                posts = posts.Where(p => p.PostCategoryId == category);
+            }
+            if (!String.IsNullOrEmpty(name))
+            {
+                posts = posts.Where(p => p.Title.Contains(name));
+            }
+
+            var count = await posts.CountAsync();
+            var items = await posts.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+
+            PostViewModel viewModel = new PostViewModel
+            {
+                PageViewModel = pageViewModel,
+                Posts = items,
+                FilterPostViewModel = new FilterPostViewModel(_context.PostCategories.ToList(), category, name),
+            };
+
+            //var applicationDbContext = _context.Posts.Include(p => p.PostCategory).OrderByDescending(b => b.Created_date);
+            //return View(await applicationDbContext.ToListAsync());
+            return View(viewModel);
         }
 
         // GET: Posts/Details/5
@@ -41,11 +68,15 @@ namespace FindTeacher.Controllers
             {
                 return NotFound();
             }
+            post.Views = post.Views + 1;
+            _context.Update(post);
+            await _context.SaveChangesAsync();
 
             return View(post);
         }
 
         // GET: Posts/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["PostCategoryId"] = new SelectList(_context.PostCategories, "Id", "Name");
@@ -57,7 +88,7 @@ namespace FindTeacher.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,ImageUrl,Views,Enabled,Comments_enabled,PostCategoryId")] Post post)
+        public async Task<IActionResult> Create([Bind("Id,Title,Pre_content,Content,Author,Created_date,ImageUrl,Views,Enabled,Comments_enabled,PostCategoryId")] Post post)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +122,7 @@ namespace FindTeacher.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,ImageUrl,Views,Enabled,Comments_enabled,PostCategoryId")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,Pre_content,ImageUrl,Views,Enabled,Comments_enabled,PostCategoryId")] Post post)
         {
             if (id != post.Id)
             {

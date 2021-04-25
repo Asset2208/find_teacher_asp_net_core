@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FindTeacher.Data;
 using FindTeacher.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FindTeacher.Controllers
 {
@@ -44,6 +45,7 @@ namespace FindTeacher.Controllers
         }
 
         // GET: PostCategories/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
