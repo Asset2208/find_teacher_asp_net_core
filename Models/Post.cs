@@ -20,10 +20,10 @@ namespace FindTeacher.Models
         public int? PostCategoryId { get; set; }
         public PostCategory PostCategory { get; set; }
 
-        public ICollection<Comment> Comments { get; set; }
+        public ICollection<CommentPost> Comments { get; set; }
         public Post()
         {
-            Comments = new List<Comment>();
+            Comments = new List<CommentPost>();
         }
     }
 }

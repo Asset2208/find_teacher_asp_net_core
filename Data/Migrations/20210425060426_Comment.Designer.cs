@@ -4,14 +4,16 @@ using FindTeacher.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FindTeacher.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210425060426_Comment")]
+    partial class Comment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,21 +86,6 @@ namespace FindTeacher.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("FindTeacher.Models.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
-                });
-
             modelBuilder.Entity("FindTeacher.Models.CommentPost", b =>
                 {
                     b.Property<int>("Id")
@@ -128,26 +115,6 @@ namespace FindTeacher.Data.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("CommentPosts");
-                });
-
-            modelBuilder.Entity("FindTeacher.Models.District", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CityId");
-
-                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("FindTeacher.Models.Post", b =>
@@ -406,15 +373,6 @@ namespace FindTeacher.Data.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("FindTeacher.Models.District", b =>
-                {
-                    b.HasOne("FindTeacher.Models.City", "City")
-                        .WithMany("Districts")
-                        .HasForeignKey("CityId");
-
-                    b.Navigation("City");
-                });
-
             modelBuilder.Entity("FindTeacher.Models.Post", b =>
                 {
                     b.HasOne("FindTeacher.Models.PostCategory", "PostCategory")
@@ -482,11 +440,6 @@ namespace FindTeacher.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FindTeacher.Models.City", b =>
-                {
-                    b.Navigation("Districts");
                 });
 
             modelBuilder.Entity("FindTeacher.Models.Post", b =>

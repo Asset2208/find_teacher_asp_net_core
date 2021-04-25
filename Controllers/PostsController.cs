@@ -60,10 +60,14 @@ namespace FindTeacher.Controllers
             {
                 return NotFound();
             }
+            //var comments = _context.CommentPosts.Include(c => c.ApplicationUser).Where(m => m.PostId == id).ToListAsync();
 
             var post = await _context.Posts
+                .Include(c => c.Comments)
+                .ThenInclude(d => d.ApplicationUser)
                 .Include(p => p.PostCategory)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            //post.Comments = (ICollection<CommentPost>) comments;
             if (post == null)
             {
                 return NotFound();

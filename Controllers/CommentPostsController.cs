@@ -7,27 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FindTeacher.Data;
 using FindTeacher.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FindTeacher.Controllers
 {
-    public class CommentsController : Controller
+    public class CommentPostsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CommentsController(ApplicationDbContext context)
+        public CommentPostsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Comments
+        // GET: CommentPosts
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Comments.Include(c => c.Post);
+            var applicationDbContext = _context.CommentPosts.Include(c => c.ApplicationUser).Include(c => c.Post);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Comments/Details/5
+        // GET: CommentPosts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,44 +34,46 @@ namespace FindTeacher.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments
+            var commentPost = await _context.CommentPosts
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Post)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (comment == null)
+            if (commentPost == null)
             {
                 return NotFound();
             }
 
-            return View(comment);
+            return View(commentPost);
         }
 
-        // GET: Comments/Create
-        [Authorize(Roles = "Admin,User")]
+        // GET: CommentPosts/Create
         public IActionResult Create()
         {
+            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Email");
             ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Title");
             return View();
         }
 
-        // POST: Comments/Create
+        // POST: CommentPosts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Content,User_id,Enabled,Created_date,PostId")] Comment comment)
+        public async Task<IActionResult> Create([Bind("Id,Content,Enabled,ApplicationUserId,Created_date,PostId")] CommentPost commentPost)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(comment);
+                commentPost.ApplicationUser = _context.Users.Find(commentPost.ApplicationUserId);
+                _context.Add(commentPost);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Posts", new { id = commentPost.PostId });
             }
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
-            return View(comment);
+            //ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", commentPost.ApplicationUserId);
+            //ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", commentPost.PostId);
+            return View(commentPost);
         }
 
-        // GET: Comments/Edit/5
-        [Authorize(Roles = "Admin")]
+        // GET: CommentPosts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,23 +81,24 @@ namespace FindTeacher.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment == null)
+            var commentPost = await _context.CommentPosts.FindAsync(id);
+            if (commentPost == null)
             {
                 return NotFound();
             }
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
-            return View(comment);
+            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", commentPost.ApplicationUserId);
+            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", commentPost.PostId);
+            return View(commentPost);
         }
 
-        // POST: Comments/Edit/5
+        // POST: CommentPosts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,User_id,Enabled,Created_date,PostId")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Enabled,ApplicationUserId,Created_date,PostId")] CommentPost commentPost)
         {
-            if (id != comment.Id)
+            if (id != commentPost.Id)
             {
                 return NotFound();
             }
@@ -105,12 +107,12 @@ namespace FindTeacher.Controllers
             {
                 try
                 {
-                    _context.Update(comment);
+                    _context.Update(commentPost);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.Id))
+                    if (!CommentPostExists(commentPost.Id))
                     {
                         return NotFound();
                     }
@@ -121,11 +123,12 @@ namespace FindTeacher.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
-            return View(comment);
+            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", commentPost.ApplicationUserId);
+            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", commentPost.PostId);
+            return View(commentPost);
         }
 
-        // GET: Comments/Delete/5
+        // GET: CommentPosts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,31 +136,32 @@ namespace FindTeacher.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments
+            var commentPost = await _context.CommentPosts
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Post)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (comment == null)
+            if (commentPost == null)
             {
                 return NotFound();
             }
 
-            return View(comment);
+            return View(commentPost);
         }
 
-        // POST: Comments/Delete/5
+        // POST: CommentPosts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
-            _context.Comments.Remove(comment);
+            var commentPost = await _context.CommentPosts.FindAsync(id);
+            _context.CommentPosts.Remove(commentPost);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CommentExists(int id)
+        private bool CommentPostExists(int id)
         {
-            return _context.Comments.Any(e => e.Id == id);
+            return _context.CommentPosts.Any(e => e.Id == id);
         }
     }
 }
