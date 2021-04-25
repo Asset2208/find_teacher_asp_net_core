@@ -6,21 +6,27 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using FindTeacher.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace FindTeacher.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
+            _context = context;
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var applicationDbContext = _context.Teachers.Include(t => t.ApplicationUser).Include(t => t.City);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         public IActionResult Privacy()

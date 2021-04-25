@@ -215,6 +215,41 @@ namespace FindTeacher.Data.Migrations
                     b.ToTable("PostCategories");
                 });
 
+            modelBuilder.Entity("FindTeacher.Models.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.SubjectBranch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("SubjectBranches");
+                });
+
             modelBuilder.Entity("FindTeacher.Models.SystemFeedback", b =>
                 {
                     b.Property<int>("Id")
@@ -254,6 +289,148 @@ namespace FindTeacher.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SystemFeedbackCategories");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.Teacher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEnabledAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTeachOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_Filled_Achievement")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_Filled_Education")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_Filled_Experience")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Story")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubjectsTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherAchievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AchievementTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique()
+                        .HasFilter("[TeacherId] IS NOT NULL");
+
+                    b.ToTable("TeacherAchievements");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherEducation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Speciality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UniversityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique()
+                        .HasFilter("[TeacherId] IS NOT NULL");
+
+                    b.ToTable("TeacherEducations");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherExperience", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExperienceTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique()
+                        .HasFilter("[TeacherId] IS NOT NULL");
+
+                    b.ToTable("TeacherExperiences");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -424,6 +601,15 @@ namespace FindTeacher.Data.Migrations
                     b.Navigation("PostCategory");
                 });
 
+            modelBuilder.Entity("FindTeacher.Models.SubjectBranch", b =>
+                {
+                    b.HasOne("FindTeacher.Models.Subject", "Subject")
+                        .WithMany("SubjectBranches")
+                        .HasForeignKey("SubjectId");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("FindTeacher.Models.SystemFeedback", b =>
                 {
                     b.HasOne("FindTeacher.Models.SystemFeedbackCategory", "SystemFeedbackCategory")
@@ -431,6 +617,48 @@ namespace FindTeacher.Data.Migrations
                         .HasForeignKey("SystemFeedbackCategoryId");
 
                     b.Navigation("SystemFeedbackCategory");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.Teacher", b =>
+                {
+                    b.HasOne("FindTeacher.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("FindTeacher.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("City");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherAchievement", b =>
+                {
+                    b.HasOne("FindTeacher.Models.Teacher", "Teacher")
+                        .WithOne("TeacherAchievement")
+                        .HasForeignKey("FindTeacher.Models.TeacherAchievement", "TeacherId");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherEducation", b =>
+                {
+                    b.HasOne("FindTeacher.Models.Teacher", "Teacher")
+                        .WithOne("TeacherEducation")
+                        .HasForeignKey("FindTeacher.Models.TeacherEducation", "TeacherId");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.TeacherExperience", b =>
+                {
+                    b.HasOne("FindTeacher.Models.Teacher", "Teacher")
+                        .WithOne("TeacherExperience")
+                        .HasForeignKey("FindTeacher.Models.TeacherExperience", "TeacherId");
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -499,9 +727,23 @@ namespace FindTeacher.Data.Migrations
                     b.Navigation("Posts");
                 });
 
+            modelBuilder.Entity("FindTeacher.Models.Subject", b =>
+                {
+                    b.Navigation("SubjectBranches");
+                });
+
             modelBuilder.Entity("FindTeacher.Models.SystemFeedbackCategory", b =>
                 {
                     b.Navigation("SystemFeedbacks");
+                });
+
+            modelBuilder.Entity("FindTeacher.Models.Teacher", b =>
+                {
+                    b.Navigation("TeacherAchievement");
+
+                    b.Navigation("TeacherEducation");
+
+                    b.Navigation("TeacherExperience");
                 });
 #pragma warning restore 612, 618
         }
